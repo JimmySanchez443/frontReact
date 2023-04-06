@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:latest as react-build
 
 WORKDIR /app
 
@@ -12,6 +12,10 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+FROM nginx:latest
 
-CMD ["npm","start"]
+COPY --from=react-build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
